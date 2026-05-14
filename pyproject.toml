@@ -1,6 +1,6 @@
 [project]
 name = "rubin"
-version = "0.1.0"
+version = "0.2.0"
 description = "Headless music mastering system for acoustic vocal + guitar"
 requires-python = ">=3.11"
 dependencies = [
@@ -12,6 +12,7 @@ dependencies = [
     "click>=8.1.0",
     "rich>=13.7.0",
     "pydantic>=2.6.0",
+    "mutagen>=1.47.0",
 ]
 
 [project.scripts]

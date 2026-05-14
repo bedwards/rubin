@@ -75,8 +75,11 @@ def cli():
     metavar="KEY=VALUE",
     help="Override master chain parameter (e.g. target_lufs=-16.0). Repeatable.",
 )
+@click.option("--song-title", "-t", default="", help="Song title for metadata tags.")
+@click.option("--artist", "-a", default="", help="Artist name for metadata tags.")
+@click.option("--parallel/--no-parallel", default=True, show_default=True, help="Process styles in parallel.")
 @click.option("--json-output", is_flag=True, help="Output results as JSON.")
-def master(vocal, guitar, output_dir, style, vocal_param, guitar_param, master_param, json_output):
+def master(vocal, guitar, output_dir, style, vocal_param, guitar_param, master_param, song_title, artist, parallel, json_output):
     """Master VOCAL and GUITAR stems to OUTPUT_DIR.
 
     \b
@@ -109,6 +112,9 @@ def master(vocal, guitar, output_dir, style, vocal_param, guitar_param, master_p
             vocal_preset_overrides=vocal_overrides or None,
             guitar_preset_overrides=guitar_overrides or None,
             master_preset_overrides=master_overrides or None,
+            song_title=song_title,
+            artist=artist,
+            parallel=parallel,
         )
 
     if json_output:
