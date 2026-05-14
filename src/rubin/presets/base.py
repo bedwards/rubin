@@ -17,7 +17,7 @@ class VocalPreset(BaseModel):
 
     # De-essing: frequency center and threshold
     deess_freq_hz: float = 7500.0
-    deess_threshold_db: float = -18.0
+    deess_threshold_db: float = -10.0
     deess_ratio: float = 6.0
     deess_attack_ms: float = 1.0
     deess_release_ms: float = 50.0
@@ -38,12 +38,19 @@ class VocalPreset(BaseModel):
     saturation_drive: float = 0.0    # 0-1 normalized
     saturation_mix: float = 0.5
 
-    # Compressor
+    # Stage 1 compressor: fast FET-style peak control
     comp_threshold_db: float = -18.0
     comp_ratio: float = 3.0
     comp_attack_ms: float = 10.0
     comp_release_ms: float = 80.0
     comp_makeup_db: float = 3.0
+
+    # Stage 2 compressor: optical/transparent gain riding (0 = disabled)
+    comp2_threshold_db: float = 0.0     # 0 = disabled
+    comp2_ratio: float = 1.8
+    comp2_attack_ms: float = 40.0
+    comp2_release_ms: float = 200.0
+    comp2_makeup_db: float = 1.0
 
     # Reverb
     reverb_room_size: float = 0.4

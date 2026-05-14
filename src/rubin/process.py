@@ -45,6 +45,20 @@ _STYLE_LABELS = {
 }
 
 
+def _auto_gain_stage(audio: np.ndarray, target_peak_db: float = -12.0) -> np.ndarray:
+    """Normalize peak to target_peak_db so compressors work on transients.
+
+    Raw recordings may peak at 0 dBFS; without staging, every threshold
+    in the chain triggers constantly, collapsing dynamics.
+    """
+    peak = np.max(np.abs(audio))
+    if peak < 1e-8:
+        return audio
+    target_peak = 10 ** (target_peak_db / 20.0)
+    gain = target_peak / peak
+    return (audio * gain).astype(np.float32)
+
+
 def encode_masters(
     wav_path: Path,
     song_dir: Path,

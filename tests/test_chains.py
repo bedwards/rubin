@@ -121,7 +121,34 @@ class TestMasterChain:
         mix, stats = chain.process(v_proc, g_proc, SR)
 
         tp_limit = ANALOG_CONSOLE_MASTER.limiter_true_peak_db
-        # Allow 0.3 dB over due to LUFS normalization applied after limiter
         assert stats["true_peak_db"] <= tp_limit + 0.5, (
             f"True peak {stats['true_peak_db']:.2f} exceeded limit {tp_limit}"
         )
+
+    def test_styles_differ_in_crest_factor(self):
+        """Verify each style has distinct dynamic character.
+
+        Crest factor should decrease: analog_console > tape > lofi.
+        This catches over-compression that collapses style differences.
+        """
+        vocal = make_stereo_tone(880.0, amp=0.3)
+        guitar = make_stereo_tone(330.0, amp=0.25)
+
+        from rubin.chains import VocalChain, GuitarChain
+
+        crest_factors = []
+        for vp, gp, mp in [
+            (ANALOG_CONSOLE_VOCAL, ANALOG_CONSOLE_GUITAR, ANALOG_CONSOLE_MASTER),
+            (TAPE_VOCAL, TAPE_GUITAR, TAPE_MASTER),
+            (LOFI_VOCAL, LOFI_GUITAR, LOFI_MASTER),
+        ]:
+            v = VocalChain(vp).process(vocal.copy(), SR)
+            g = GuitarChain(gp).process(guitar.copy(), SR)
+            mix, _ = MasterChain(mp).process(v, g, SR)
+            peak = np.max(np.abs(mix))
+            rms = np.sqrt(np.mean(mix ** 2))
+            crest_factors.append(peak / (rms + 1e-8))
+
+        analog_cf, tape_cf, lofi_cf = crest_factors
+        # Analog should be more dynamic (higher crest) than lo-fi
+        assert analog_cf > lofi_cf, f"Analog crest {analog_cf:.2f} should exceed lofi {lofi_cf:.2f}"
