@@ -40,7 +40,8 @@ def save_audio(audio: np.ndarray, sr: int, path: Path, bit_depth: int = 24) -> N
 def encode_masters(wav_path: Path, song_dir: Path, style: str) -> list[Path]:
     """Encode a WAV master to distribution formats via ffmpeg."""
     outputs = []
-    base = song_dir / "masters" / style
+    # Use same base name as WAV master (without _master suffix for clarity)
+    base = song_dir / "masters" / f"{style}"
 
     # 320k MP3
     mp3_path = base.with_suffix(".mp3")
