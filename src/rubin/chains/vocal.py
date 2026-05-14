@@ -67,6 +67,22 @@ class VocalChain:
                 release_ms=p.deess_release_ms,
             ).astype(np.float32)
 
+        # --- Phase 3b: Stage 2 compression (optical, transparent gain riding) ---
+        # Placed after de-essing so sibilance doesn't trigger the compressor
+        if p.comp2_threshold_db < 0:
+            comp2_board = Pedalboard([
+                pb.Compressor(
+                    threshold_db=p.comp2_threshold_db,
+                    ratio=p.comp2_ratio,
+                    attack_ms=p.comp2_attack_ms,
+                    release_ms=p.comp2_release_ms,
+                ),
+                pb.Gain(gain_db=p.comp2_makeup_db),
+            ])
+            audio_pb = _to_pb(audio)
+            audio_pb = comp2_board(audio_pb, sr)
+            audio = _from_pb(audio_pb)
+
         # --- Phase 4: Additive/creative EQ (presence + air) ---
         additive_eq_board = Pedalboard([
             pb.PeakFilter(

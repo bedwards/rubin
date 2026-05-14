@@ -100,7 +100,8 @@ class MasterChain:
             noise = dsp.vinyl_noise(mix.shape[0], sr, p.master_vinyl_noise_level, 2)
             mix = (mix + noise).astype(np.float32)
 
-        # --- Brick wall limiter ---
+        # --- Brick wall limiter (before LUFS norm) ---
+        # Catches any peaks from saturation/noise before normalization boost.
         limiter_board = Pedalboard([
             pb.Limiter(
                 threshold_db=p.limiter_true_peak_db - 0.5,
@@ -109,7 +110,7 @@ class MasterChain:
         ])
         mix = _from_pb(limiter_board(_to_pb(mix), sr))
 
-        # --- LUFS normalize ---
+        # --- LUFS normalize + true peak protection ---
         mix, stats = normalize_to_lufs(
             mix, sr,
             target_lufs=p.target_lufs,
